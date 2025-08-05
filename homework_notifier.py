@@ -51,10 +51,12 @@ def main():
                 lesson_title = review_result["new_attempts"][0]["lesson_title"]
                 is_negative = review_result["new_attempts"][0]["is_negative"]
                 lesson_url = review_result["new_attempts"][0]["lesson_url"]
+
+                text_message = f"Работа проверена {lesson_title}. \nОшибок нет! Можно приступать к следующему уроку! \n{lesson_url}"
+
                 if is_negative:
                     text_message = f"Работа проверена {lesson_title}. \nВ работе нашлись ошибки. Нужно исправить! \n{lesson_url}"
-                else:
-                    text_message = f"Работа проверена {lesson_title}. \nОшибок нет! Можно приступать к следующему уроку! \n{lesson_url}"
+
                 bot.send_message(chat_id, text=text_message)
 
         except requests.exceptions.ReadTimeout:
