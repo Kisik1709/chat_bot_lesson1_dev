@@ -42,15 +42,15 @@ def main():
             response = requests.get(
                 url, headers=headers, params=params)
             response.raise_for_status()
-            inspections_info = response.json()
+            review_result = response.json()
 
-            timestamp_to_request = inspections_info.get("timestamp_to_request")
+            timestamp_to_request = review_result.get("timestamp_to_request")
             params["timestamp"] = timestamp_to_request
 
-            if inspections_info["status"] == "found":
-                lesson_title = inspections_info["new_attempts"][0]["lesson_title"]
-                is_negative = inspections_info["new_attempts"][0]["is_negative"]
-                lesson_url = inspections_info["new_attempts"][0]["lesson_url"]
+            if review_result["status"] == "found":
+                lesson_title = review_result["new_attempts"][0]["lesson_title"]
+                is_negative = review_result["new_attempts"][0]["is_negative"]
+                lesson_url = review_result["new_attempts"][0]["lesson_url"]
                 if is_negative:
                     text_message = f"Работа проверена {lesson_title}. \nВ работе нашлись ошибки. Нужно исправить! \n{lesson_url}"
                 else:
