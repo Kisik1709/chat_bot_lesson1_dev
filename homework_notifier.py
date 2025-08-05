@@ -60,7 +60,7 @@ def main():
                 bot.send_message(chat_id, text=text_message)
 
         except requests.exceptions.ReadTimeout:
-            logging.exception("Ошибка запроса")
+            pass
         except requests.exceptions.ConnectionError:
             logging.exception("Ошибка подключения к интернету")
         except telegram.error.TelegramError:
