@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import logging
 import telegram
 import requests
@@ -64,7 +65,9 @@ def main():
         except requests.exceptions.ConnectionError:
             logging.exception("Ошибка подключения к интернету")
         except telegram.error.TelegramError:
-            logging.exception("Ошибка отправки сообщения в бот")
+            logging.exception(
+                "Ошибка отправки сообщения в бот. Повтор через 5 минут.")
+            time.sleep(300)
 
 
 if __name__ == "__main__":
