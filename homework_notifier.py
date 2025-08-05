@@ -1,18 +1,9 @@
 import os
 import sys
 import logging
-import argparse
 import telegram
 import requests
 from dotenv import load_dotenv
-
-
-def create_parser(default_chat_id):
-    parser = argparse.ArgumentParser(
-        description="Скрипт для отследивания статуса проверки задания.")
-    parser.add_argument("chat_id", nargs="?", type=int, default=default_chat_id,
-                        help="chat_id пользователя. По умолчанию из .env")
-    return parser
 
 
 def setup_logger():
@@ -25,9 +16,6 @@ def setup_logger():
 def main():
     load_dotenv()
     setup_logger()
-    default_chat_id = os.getenv("CHAT_ID")
-    parser = create_parser(default_chat_id)
-    parsed_args = parser.parse_args()
 
     tg_token = os.getenv("API_TELEGRAM")
     if not tg_token:
@@ -37,7 +25,9 @@ def main():
     if not dev_token:
         sys.exit("Нет API от devman. Завершение программы!")
 
-    chat_id = parsed_args.chat_id
+    chat_id = os.getenv("CHAT_ID")
+    if not chat_id:
+        sys.exit("Не указан chat_id. Завершение программы!")
 
     url = "https://dvmn.org/api/long_polling/"
     headers = {
