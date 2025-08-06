@@ -63,11 +63,12 @@ def main():
         except requests.exceptions.ReadTimeout:
             pass
         except requests.exceptions.ConnectionError:
-            logging.exception("Ошибка подключения к интернету")
+            logging.exception(
+                "Ошибка подключения к интернету. Повтор через 5 минут.")
+            time.sleep(300)
         except telegram.error.TelegramError:
             logging.exception(
-                "Ошибка отправки сообщения в бот. Повтор через 5 минут.")
-            time.sleep(300)
+                "Ошибка отправки сообщения в бот.")
 
 
 if __name__ == "__main__":
