@@ -15,14 +15,12 @@ class TelegramLogHandler(logging.Handler):
 
     def emit(self, record):
         log_entry = self.format(record)
-
         self.bot.send_message(self.chat_id, log_entry)
 
 
 def setup_logger(bot, chat_id):
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
-
     logger.addHandler(TelegramLogHandler(bot, chat_id))
 
 
@@ -53,35 +51,39 @@ def main():
 
     while True:
         try:
-            response = requests.get(
-                url, headers=headers, params=params)
-            response.raise_for_status()
-            review_result = response.json()
+            try:
+                response = requests.get(
+                    url, headers=headers, params=params)
+                response.raise_for_status()
+                review_result = response.json()
 
-            timestamp_to_request = review_result.get("timestamp_to_request")
-            params["timestamp"] = timestamp_to_request
+                timestamp_to_request = review_result.get(
+                    "timestamp_to_request")
+                params["timestamp"] = timestamp_to_request
 
-            if review_result["status"] == "found":
-                lesson_title = review_result["new_attempts"][0]["lesson_title"]
-                is_negative = review_result["new_attempts"][0]["is_negative"]
-                lesson_url = review_result["new_attempts"][0]["lesson_url"]
+                if review_result["status"] == "found":
+                    lesson_title = review_result["new_attempts"][0]["lesson_title"]
+                    is_negative = review_result["new_attempts"][0]["is_negative"]
+                    lesson_url = review_result["new_attempts"][0]["lesson_url"]
 
-                text_message = f"Работа проверена работа по уроку: '{lesson_title}'. \nОшибок нет! Можно приступать к следующему уроку! \n{lesson_url}"
+                    text_message = f"Работа проверена работа по уроку: '{lesson_title}'. \nОшибок нет! Можно приступать к следующему уроку! \n{lesson_url}"
 
-                if is_negative:
-                    text_message = f"Работа проверена по уроку: '{lesson_title}'. \nВ работе нашлись ошибки. Нужно исправить! \n{lesson_url}"
+                    if is_negative:
+                        text_message = f"Работа проверена по уроку: '{lesson_title}'. \nВ работе нашлись ошибки. Нужно исправить! \n{lesson_url}"
 
-                bot.send_message(chat_id, text=text_message)
+                    bot.send_message(chat_id, text=text_message)
 
-        except requests.exceptions.ReadTimeout:
-            pass
-        except requests.exceptions.ConnectionError:
-            logging.exception(
-                "Ошибка подключения к интернету. Повтор через 5 минут.")
-            time.sleep(300)
-        except telegram.error.TelegramError:
-            logging.exception(
-                "Ошибка отправки сообщения в бот.")
+            except requests.exceptions.ReadTimeout:
+                pass
+            except requests.exceptions.ConnectionError:
+                logging.exception(
+                    "Ошибка подключения к интернету. Повтор через 5 минут.")
+                time.sleep(300)
+            except telegram.error.TelegramError:
+                logging.exception("Ошибка отправки сообщения в бот.")
+        except Exception:
+            logging.exception("Бот упал с ошибкой.")
+            time.sleep(15)
 
 
 if __name__ == "__main__":
