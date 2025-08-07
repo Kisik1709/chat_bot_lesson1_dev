@@ -7,17 +7,27 @@ import requests
 from dotenv import load_dotenv
 
 
-def setup_logger():
+class TelegramLogHandler(logging.Handler):
+    def __init__(self, bot, chat_id):
+        super().__init__()
+        self.bot = bot
+        self.chat_id = chat_id
+
+    def emit(self, record):
+        log_entry = self.format(record)
+
+        self.bot.send_message(self.chat_id, log_entry)
+
+
+def setup_logger(bot, chat_id):
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
 
-    stream_handler = logging.StreamHandler(sys.stdout)
-    logger.addHandler(stream_handler)
+    logger.addHandler(TelegramLogHandler(bot, chat_id))
 
 
 def main():
     load_dotenv()
-    setup_logger()
 
     tg_token = os.getenv("API_TELEGRAM")
     if not tg_token:
@@ -31,14 +41,15 @@ def main():
     if not chat_id:
         sys.exit("Не указан chat_id. Завершение программы!")
 
+    bot = telegram.Bot(token=tg_token)
+    setup_logger(bot, chat_id)
+    logging.info("BOT STARTED")
+
     url = "https://dvmn.org/api/long_polling/"
     headers = {
         "Authorization": f"Token {dev_token}"
     }
     params = {}
-
-    bot = telegram.Bot(token=tg_token)
-    logging.info("BOT STARTED")
 
     while True:
         try:
