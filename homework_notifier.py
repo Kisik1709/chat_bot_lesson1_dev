@@ -8,10 +8,11 @@ from dotenv import load_dotenv
 
 
 def setup_logger():
-    base_dir = os.path.dirname(__file__)
-    log_filepath = os.path.join(base_dir, "app.log")
-    logging.basicConfig(level=logging.INFO,
-                        filename=log_filepath, filemode="a")
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    stream_handler = logging.StreamHandler(sys.stdout)
+    logger.addHandler(stream_handler)
 
 
 def main():
@@ -37,6 +38,7 @@ def main():
     params = {}
 
     bot = telegram.Bot(token=tg_token)
+    logging.info("BOT STARTED")
 
     while True:
         try:
@@ -53,10 +55,10 @@ def main():
                 is_negative = review_result["new_attempts"][0]["is_negative"]
                 lesson_url = review_result["new_attempts"][0]["lesson_url"]
 
-                text_message = f"Работа проверена {lesson_title}. \nОшибок нет! Можно приступать к следующему уроку! \n{lesson_url}"
+                text_message = f"Работа проверена работа по уроку: '{lesson_title}'. \nОшибок нет! Можно приступать к следующему уроку! \n{lesson_url}"
 
                 if is_negative:
-                    text_message = f"Работа проверена {lesson_title}. \nВ работе нашлись ошибки. Нужно исправить! \n{lesson_url}"
+                    text_message = f"Работа проверена по уроку: '{lesson_title}'. \nВ работе нашлись ошибки. Нужно исправить! \n{lesson_url}"
 
                 bot.send_message(chat_id, text=text_message)
 
